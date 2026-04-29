@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Readiness + PAM Assessment — Workflow</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #ffffff;
+    color: #1a1a1a;
+    padding: 40px 48px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .doc-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 4px;
+  }
+  .doc-subtitle {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 28px;
+  }
+  .legend {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #eee;
+  }
+  .legend-items { display: flex; gap: 20px; }
+  .legend-item { display: flex; align-items: center; gap: 7px; font-size: 12px; color: #666; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+  .author { font-size: 12px; font-weight: 600; color: #4A7CC7; }
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #aaa;
+    margin: 32px 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .step-wrap { margin-bottom: 12px; }
+  .step-header {
+    font-size: 11px;
+    font-weight: 600;
+    color: #999;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .layer-current {
+    background: #f7f7f5;
+    border: 0.5px solid #e0e0dc;
+    border-radius: 10px 10px 0 0;
+    padding: 12px 16px;
+  }
+  .layer-current .layer-tag {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: #aaa;
+    margin-bottom: 5px;
+  }
+  .layer-current p {
+    font-size: 12.5px;
+    color: #666;
+    line-height: 1.55;
+    margin: 0;
+  }
+  .layer-added {
+    background: #EFF5FF;
+    border: 0.5px solid #9BBCE8;
+    border-top: none;
+    border-radius: 0 0 10px 10px;
+    padding: 14px 16px;
+  }
+  .layer-added .layer-tag {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: #4A7CC7;
+    margin-bottom: 10px;
+  }
+  .added-grid {
+    display: grid;
+    grid-template-columns: 2fr 1.2fr 1.5fr;
+    gap: 16px;
+  }
+  .added-col-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: #2D5FA8;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .added-col p {
+    font-size: 12px;
+    color: #1E3F6E;
+    line-height: 1.55;
+    margin: 0 0 5px;
+  }
+  .bullets { list-style: none; padding: 0; margin: 0; }
+  .bullets li {
+    font-size: 12px;
+    color: #1E3F6E;
+    line-height: 1.55;
+    padding-left: 10px;
+    position: relative;
+    margin-bottom: 2px;
+  }
+  .bullets li::before { content: '·'; position: absolute; left: 0; color: #4A7CC7; }
+  .option-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #2D5FA8;
+    margin: 6px 0 2px;
+  }
+  .option-text {
+    font-size: 11.5px;
+    color: #1E3F6E;
+    line-height: 1.45;
+    margin: 0 0 4px;
+  }
+  .nota {
+    font-size: 11px;
+    color: #4A7CC7;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 0.5px solid #9BBCE8;
+    line-height: 1.4;
+  }
+  .col-divider {
+    border-left: 0.5px solid #9BBCE8;
+    padding-left: 16px;
+  }
+  .numbered-item { margin-bottom: 8px; }
+  .numbered-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #2D5FA8;
+    margin-bottom: 3px;
+  }
+  .numbered-body {
+    font-size: 12px;
+    color: #1E3F6E;
+    line-height: 1.5;
+  }
+  .products-section { margin-top: 32px; }
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 14px;
+  }
+  .product-card {
+    background: #E1F5EE;
+    border: 0.5px solid #5DCAA5;
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .product-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #085041;
+    margin-bottom: 6px;
+  }
+  .product-when {
+    font-size: 11.5px;
+    color: #0F6E56;
+    line-height: 1.45;
+    margin-bottom: 8px;
+  }
+  .product-body {
+    font-size: 11.5px;
+    color: #085041;
+    line-height: 1.5;
+  }
+  .product-body ul { list-style: none; padding: 0; margin: 0; }
+  .product-body ul li { padding-left: 10px; position: relative; margin-bottom: 2px; }
+  .product-body ul li::before { content: '·'; position: absolute; left: 0; color: #1D9E75; }
+  .two-col-tech {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .tech-part-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #2D5FA8;
+    margin-bottom: 4px;
+  }
+</style>
+</head>
+<body>
+
+<div class="doc-title">AI Readiness + PAM Assessment</div>
+<div class="doc-subtitle">Come si rafforza il workflow con il Human &amp; Behavioural Layer</div>
+
+<div class="legend">
+  <div class="legend-items">
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#f7f7f5;border:0.5px solid #ddd"></div>
+      Workflow attuale
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#EFF5FF;border:0.5px solid #9BBCE8"></div>
+      Livello aggiuntivo — Human &amp; Behavioural Layer
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#E1F5EE;border:0.5px solid #5DCAA5"></div>
+      Nuovi prodotti
+    </div>
+  </div>
+  <div class="author">Albina</div>
+</div>
+
+<!-- AI READINESS -->
+<div class="section-label">AI Readiness Assessment</div>
+
+<!-- STEP 0 AI -->
+<div class="step-wrap">
+  <div class="step-header">Step 0 — Pre-assessment</div>
+  <div class="layer-current">
+    <div class="layer-tag">Workflow attuale</div>
+    <p>I dati non vengono raccolti prima dell'incontro. Il consulente parte da zero.</p>
+  </div>
+  <div class="layer-added">
+    <div class="layer-tag">Livello aggiuntivo — Albina</div>
+    <div class="added-grid">
+      <div class="added-col">
+        <div class="added-col-title">Cosa cambia e perché</div>
+        <p>Prima della sessione i partecipanti compilano un questionario breve. Le domande sono diverse per ruolo, quindi emerge subito un quadro concreto: chi c'è in azienda, quali strumenti vengono usati davvero, come sono organizzati i processi oggi.</p>
+        <p>L'incontro non parte più da zero. I dati raccolti qui diventano anche il punto di riferimento per capire cosa cambia davvero dopo il go-live.</p>
+      </div>
+      <div class="added-col col-divider">
+        <div class="added-col-title">Attività</div>
+        <ul class="bullets">
+          <li>questionario pre-sessione adattivo per ruolo</li>
+          <li>profilazione per funzione e reparto</li>
+          <li>raccolta baseline per adoption monitoring</li>
+        </ul>
+      </div>
+      <div class="added-col col-divider">
+        <div class="added-col-title">Realizzazione tecnica</div>
+        <div class="option-label">Opzione A</div>
+        <p class="option-text">Questionario online (Typeform, Google Forms) con percorsi per ruolo. Nessuno sviluppo necessario.</p>
+        <div class="option-label">Opzione B</div>
+        <p class="option-text">Questionario adattivo con analisi automatica e profilo preliminare. Richiede sviluppo dedicato.</p>
+        <div class="nota">Dati da trattare secondo protocollo GDPR.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 1 AI -->
+<div class="step-wrap">
+  <div class="step-header">Step 1 — Sessione</div>
+  <div class="layer-current">
+    <div class="layer-tag">Workflow attuale</div>
+    <p>Una sola sessione, di solito con il management. Tutti i profili vengono coperti insieme e i punteggi vengono assegnati durante la conversazione.</p>
+  </div>
+  <div class="layer-added">
+    <div class="layer-tag">Livello aggiuntivo — Albina</div>
+    <div class="added-grid">
+      <div class="added-col">
+        <div class="added-col-title">Cosa cambia e perché</div>
+        <p>La sessione non è più unica. Si lavora separatamente con tre livelli: ruoli di vertice, middle management, team operativo. Questo rende visibile dove quello che viene deciso non coincide con quello che succede ogni giorno.</p>
+        <p>Le conversazioni vengono registrate e analizzate. Emergono segnali che di solito restano nascosti: dove c'è resistenza, dove manca un vero responsabile, dove in passato le iniziative non hanno funzionato. Non dipendono dall'interpretazione del consulente — vengono fuori perché si ripetono in modo coerente tra livelli diversi.</p>
+        <p>In parallelo si capisce quanto ogni gruppo è davvero a suo agio con l'AI e quanto l'organizzazione è in grado di imparare e adattarsi. Da qui dipende il tipo di intervento che servirà dopo.</p>
+      </div>
+      <div class="added-col col-divider">
+        <div class="added-col-title">Attività</div>
+        <ul class="bullets">
+          <li>conversazioni separate per livello</li>
+          <li>domande narrative e scale per far emergere resistenza</li>
+          <li>osservazione della sicurezza psicologica</li>
+          <li>rilevazione AI literacy per gruppo</li>
+          <li>verifica della capacità di apprendimento</li>
+        </ul>
+      </div>
+      <div class="added-col col-divider">
+        <div class="added-col-title">Realizzazione tecnica</div>
+        <div class="option-label">Opzione A</div>
+        <p class="option-text">Trascrizione automatica (Otter.ai, Fireflies, Zoom) + analisi manuale con supporto AI. Nessuno sviluppo necessario.</p>
+        <div class="option-label">Opzione B</div>
+        <p class="option-text">Sistema integrato trascrizione + analisi pattern + output automatico. Richiede sviluppo dedicato.</p>
+        <div class="nota">Entrambe le opzioni richiedono consenso alla registrazione e protocollo GDPR.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 2 AI -->
+<div class="step-wrap">
+  <div class="step-header">Step 2 — Report</div>
+  <div class="layer-current">
+    <div class="layer-tag">Workflow attuale</div>
+    <p>Il report include il Final Readiness Score, l'analisi per i 6 profili, l'OHRI e una Roadmap con azioni, priorità e owner.</p>
+  </div>
+  <div class="layer-added">
+    <div class="layer-tag">Livello aggiuntivo — Albina</div>
+    <div class="added-grid">
+      <div class="added-col">
+        <div class="added-col-title">Cosa cambia e perché</div>
+        <p>Il report non si limita a dire dove si trova l'azienda. Dice anche perché è lì e cosa ha senso fare dopo.</p>
+        <div class="numbered-item">
+          <div class="numbered-title">1. La media sparisce</div>
+          <div class="numbered-body">La media tra profilo organizzativo e comportamentale viene sostituita da una matrice 2x2. La media appiattisce situazioni diverse che richiedono interventi diversi.</div>
+        </div>
+        <div class="numbered-item">
+          <div class="numbered-title">2. Impatto sui ruoli</div>
+          <div class="numbered-body">Per ogni ruolo si guarda quanto cambia davvero il lavoro: lo strumento, le attività, o il modo in cui la persona si percepisce nel ruolo. Questo serve per capire che tipo di supporto serve davvero.</div>
+        </div>
+        <div class="numbered-item">
+          <div class="numbered-title">3. Tipi di problemi separati</div>
+          <div class="numbered-body">Si distinguono tre tipi: tecnico, organizzativo, umano. Non hanno gli stessi tempi e non si risolvono allo stesso modo.</div>
+        </div>
+      </div>
+      <div class="added-col col-divider">
+        <div class="added-col-title">Attività</div>
+        <ul class="bullets">
+          <li>costruzione matrice 2x2 (P5/P6)</li>
+          <li>mappa dell'impatto per ruolo</li>
+          <li>classificazione dei gap per tipo e tempi</li>
+          <li>definizione criteri di successo e verifica nel tempo</li>
+        </ul>
+      </div>
+      <div class="added-col col-divider">
+        <div class="added-col-title">Realizzazione tecnica</div>
+        <p class="option-text">Aggiornamento metodologico al report esistente — nessuno sviluppo tecnico necessario. Richiede un template strutturato con le nuove sezioni.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 3 AI -->
+<div class="step-wrap">
+  <div class="step-header">Step 3 — Roadmap</div>
+  <div class="layer-current">
+    <div class="layer-tag">Workflow attuale</div>
+    <p>La Roadmap elenca azioni con priorità, orizzonti temporali e owner. I quick wins vengono scelti in base al potenziale tecnico.</p>
+  </div>
+  <div class="layer-added">
+    <div class="layer-tag">Livello aggiuntivo — Albina</div>
+    <div class="added-grid">
+      <div class="added-col">
+        <div class="added-col-title">Cosa cambia e perché</div>
+        <p>La Roadmap diventa un percorso con una logica precisa: prima si crea la condizione, poi si interviene.</p>
+        <div class="numbered-item">
+          <div class="numbered-title">1. Tre fasi invece di una lista</div>
+          <div class="numbered-body">creare il desiderio → togliere la paura → consolidare. Se si salta una fase, il progetto si inceppa quando tocca il lavoro quotidiano.</div>
+        </div>
+        <div class="numbered-item">
+          <div class="numbered-title">2. Tempi realistici per tipo</div>
+          <div class="numbered-body">Tecnico: 1-3 mesi. Organizzativo: 3-6 mesi. Umano: 6-18 mesi. Mettere tutto insieme produce aspettative che non reggono.</div>
+        </div>
+        <div class="numbered-item">
+          <div class="numbered-title">3. Quick wins con criterio umano</div>
+          <div class="numbered-body">Si aggiunge un criterio: basso impatto sulle persone. Un quick win ad alto impatto umano genera resistenza su tutto il resto.</div>
+        </div>
+      </div>
+      <div class="added-col col-divider">
+        <div class="added-col-title">Attività</div>
+        <ul class="bullets">
+          <li>roadmap strutturata in 3 fasi: desiderio, paura, consolidamento</li>
+          <li>ogni intervento classificato per tipo con orizzonte realistico</li>
+          <li>quick wins selezionati per potenziale tecnico e basso People Impact</li>
+        </ul>
+      </div>
+      <div class="added-col col-divider">
+        <div class="added-col-title">Realizzazione tecnica</div>
+        <p class="option-text">Aggiornamento metodologico alla Roadmap esistente — nessuno sviluppo tecnico necessario. Richiede un template strutturato con le tre fasi e la classificazione per tipo.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAM -->
+<div class="section-label">PAM Assessment</div>
+
+<!-- STEP 0 PAM -->
+<div class="step-wrap">
+  <div class="step-header">Step 0 — Pre-assessment</div>
+  <div class="layer-current">
+    <div class="layer-tag">Workflow attuale</div>
+    <p>Nessuna raccolta dati prima della sessione. Il consulente arriva e inizia da zero.</p>
+  </div>
+  <div class="layer-added">
+    <div class="layer-tag">Livello aggiuntivo — Albina</div>
+    <div class="added-grid">
+      <div class="added-col">
+        <div class="added-col-title">Cosa cambia e perché</div>
+        <p>Se l'AI Readiness Assessment è già stato fatto, il contesto generale è già chiaro. Quello che manca sono i dati sui processi specifici.</p>
+        <p>Prima della sessione PAM i responsabili e chi esegue davvero i processi compilano una scheda breve per ogni area. Il responsabile conosce il processo sulla carta. Chi lo esegue conosce le eccezioni, i workaround, i punti critici. Servono entrambe le prospettive.</p>
+        <p>Per ogni processo si aggiunge una domanda: a chi si rivolgono le persone quando qualcosa non è chiaro? Questa risposta identifica il custode informale — la persona che può facilitare o bloccare qualsiasi cambiamento.</p>
+      </div>
+      <div class="added-col col-divider">
+        <div class="added-col-title">Attività</div>
+        <ul class="bullets">
+          <li>scheda processo per area operativa</li>
+          <li>raccolta dati: tempo, frequenza, strumenti, persone coinvolte</li>
+          <li>identificazione custodi informali per processo</li>
+          <li>definizione aree prioritarie e partecipanti per sessione</li>
+        </ul>
+      </div>
+      <div class="added-col col-divider">
+        <div class="added-col-title">Realizzazione tecnica</div>
+        <div class="option-label">Opzione A</div>
+        <p class="option-text">Scheda online semplice (Google Forms, Typeform) con domande diverse per ruolo. Nessuno sviluppo necessario.</p>
+        <div class="option-label">Opzione B</div>
+        <p class="option-text">Sistema adattivo con analisi automatica e mappa preliminare dei processi. Richiede sviluppo dedicato.</p>
+        <div class="nota">I dati diventano baseline per il monitoraggio post go-live. Protocollo GDPR necessario.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 1 PAM -->
+<div class="step-wrap">
+  <div class="step-header">Step 1 — Sessione</div>
+  <div class="layer-current">
+    <div class="layer-tag">Workflow attuale</div>
+    <p>Il consulente parla con un referente per ogni area — di solito il responsabile. Per ogni flusso valuta 5 dimensioni: struttura, volume, dati, decisione, impatto. I punteggi vengono assegnati durante la conversazione.</p>
+  </div>
+  <div class="layer-added">
+    <div class="layer-tag">Livello aggiuntivo — Albina</div>
+    <div class="added-grid">
+      <div class="added-col">
+        <div class="added-col-title">Cosa cambia e perché</div>
+        <p>La sessione coinvolge tre figure per ogni processo: il responsabile, chi lo esegue ogni giorno e il custode informale identificato nel pre-assessment. Prospettive diverse sullo stesso processo.</p>
+        <p>Alle 5 dimensioni tecniche se ne aggiunge una sesta: quanto cambia il lavoro per le persone coinvolte. Cambia lo strumento, una parte delle attività, o il senso del ruolo. Due processi con lo stesso punteggio tecnico possono richiedere interventi molto diversi.</p>
+        <p>Per ogni area si valuta anche la reale apertura del reparto al cambiamento e la posizione del middle manager — allineato, neutro o a rischio. Le conversazioni vengono analizzate con lo stesso sistema dell'AI Readiness — i segnali si accumulano tra le due fasi.</p>
+      </div>
+      <div class="added-col col-divider">
+        <div class="added-col-title">Attività</div>
+        <ul class="bullets">
+          <li>sessioni con responsabile, esecutori e custode informale</li>
+          <li>valutazione 5 dimensioni tecniche per flusso</li>
+          <li>sesta dimensione: People Impact per flusso</li>
+          <li>readiness del reparto per area operativa</li>
+          <li>posizione middle manager per flusso</li>
+          <li>trascrizione e analisi pattern per flusso</li>
+        </ul>
+      </div>
+      <div class="added-col col-divider">
+        <div class="added-col-title">Realizzazione tecnica</div>
+        <div class="option-label">Opzione A</div>
+        <p class="option-text">Trascrizione automatica (Otter.ai, Fireflies, Zoom) + analisi manuale con supporto AI. Nessuno sviluppo necessario.</p>
+        <div class="option-label">Opzione B</div>
+        <p class="option-text">Sistema integrato trascrizione + analisi pattern + output automatico per flusso. Richiede sviluppo dedicato.</p>
+        <div class="nota">Consenso alla registrazione e protocollo GDPR necessari.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 2 PAM -->
+<div class="step-wrap">
+  <div class="step-header">Step 2 — Report</div>
+  <div class="layer-current">
+    <div class="layer-tag">Workflow attuale</div>
+    <p>Il report mostra la distribuzione delle raccomandazioni sui flussi, i top 5 per potenziale di automazione, i quick wins e le iniziative a medio termine. Include prerequisiti tecnici e next steps.</p>
+  </div>
+  <div class="layer-added">
+    <div class="layer-tag">Livello aggiuntivo — Albina</div>
+    <div class="added-grid">
+      <div class="added-col">
+        <div class="added-col-title">Cosa cambia e perché</div>
+        <p>Il report non indica solo dove automatizzare, ma anche cosa cambia per le persone e cosa serve per far funzionare il progetto nella pratica.</p>
+        <p>Nella tabella dei processi compare una nuova colonna: People Impact. Due processi con lo stesso AI Score possono avere un impatto molto diverso sulle persone. Questo cambia le priorità.</p>
+        <p>I quick wins si scelgono anche per basso impatto sulle persone. Ai prerequisiti tecnici si aggiungono quelli organizzativi e umani: sponsor realmente attivo, middle management allineato, Business Translator identificato.</p>
+        <p>Per ogni processo automatizzato il report segnala se le metriche di valutazione vanno riviste. Se restano le stesse, le persone continuano a lavorare come prima.</p>
+      </div>
+      <div class="added-col col-divider">
+        <div class="added-col-title">Attività</div>
+        <ul class="bullets">
+          <li>tabella flussi con colonna People Impact</li>
+          <li>quick wins con criterio tecnico e umano</li>
+          <li>prerequisiti organizzativi e umani</li>
+          <li>next steps sulle persone</li>
+          <li>raccomandazione revisione KPI per flusso</li>
+        </ul>
+      </div>
+      <div class="added-col col-divider">
+        <div class="added-col-title">Realizzazione tecnica</div>
+        <p class="option-text">Aggiornamento metodologico al report esistente — nessuno sviluppo tecnico necessario. Richiede un template strutturato con le nuove sezioni.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 3 PAM -->
+<div class="step-wrap">
+  <div class="step-header">Step 3 — Roadmap</div>
+  <div class="layer-current">
+    <div class="layer-tag">Workflow attuale</div>
+    <p>La Roadmap elenca azioni con priorità, orizzonti temporali e owner. I quick wins vengono scelti in base al potenziale tecnico. Interventi tecnici e umani vengono trattati allo stesso modo.</p>
+  </div>
+  <div class="layer-added">
+    <div class="layer-tag">Livello aggiuntivo — Albina</div>
+    <div class="added-grid">
+      <div class="added-col">
+        <div class="added-col-title">Cosa cambia e perché</div>
+        <p>La Roadmap diventa un percorso strutturato in tre fasi, collegato a processi e persone specifiche.</p>
+        <div class="numbered-item">
+          <div class="numbered-title">Tre fasi invece di una lista</div>
+          <div class="numbered-body">creare il desiderio → togliere la paura → consolidare. Se si salta una fase, il progetto si inceppa quando tocca il lavoro quotidiano.</div>
+        </div>
+        <div class="numbered-item">
+          <div class="numbered-title">Tempi realistici per tipo</div>
+          <div class="numbered-body">Tecnico: 1-3 mesi. Organizzativo: 3-6 mesi. Umano: 6-18 mesi.</div>
+        </div>
+        <div class="numbered-item">
+          <div class="numbered-title">Collegamento flusso — persone</div>
+          <div class="numbered-body">Ogni azione è collegata a un flusso specifico e alle persone che ci lavorano. Non «formare il team Sales» — ma «accompagnare le persone del team Sales su quel flusso, perché lì il People Impact è alto e il middle manager è neutro».</div>
+        </div>
+      </div>
+      <div class="added-col col-divider">
+        <div class="added-col-title">Attività</div>
+        <ul class="bullets">
+          <li>roadmap strutturata in 3 fasi: desiderio, paura, consolidamento</li>
+          <li>ogni intervento classificato per tipo con orizzonte realistico</li>
+          <li>ogni azione collegata a flusso specifico e ruoli coinvolti</li>
+          <li>quick wins selezionati per potenziale tecnico e basso People Impact</li>
+        </ul>
+      </div>
+      <div class="added-col col-divider">
+        <div class="added-col-title">Realizzazione tecnica</div>
+        <p class="option-text">Aggiornamento metodologico alla Roadmap esistente — nessuno sviluppo tecnico necessario. Richiede un template strutturato con le tre fasi e la classificazione per tipo.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 4 POST GO-LIVE -->
+<div class="step-wrap">
+  <div class="step-header">Step 4 — Post go-live</div>
+  <div class="layer-current">
+    <div class="layer-tag">Workflow attuale</div>
+    <p>Il workflow termina con la Roadmap. Non esiste un meccanismo strutturato per verificare cosa succede dopo l'implementazione.</p>
+  </div>
+  <div class="layer-added">
+    <div class="layer-tag">Livello aggiuntivo — Albina</div>
+    <div class="added-grid">
+      <div class="added-col">
+        <div class="added-col-title">Cosa cambia e perché</div>
+        <p>La domanda non è se lo strumento viene usato — è se il modo di lavorare è cambiato. Un programma di 6 mesi affianca l'implementazione tecnica dall'inizio, non quando qualcosa va storto.</p>
+        <div class="numbered-item">
+          <div class="numbered-title">Primi 30 giorni</div>
+          <div class="numbered-body">Si intercettano i segnali di regressione prima che diventino abitudine.</div>
+        </div>
+        <div class="numbered-item">
+          <div class="numbered-title">Da 1 a 3 mesi</div>
+          <div class="numbered-body">Si osserva cosa fanno le persone, non cosa dichiarano.</div>
+        </div>
+        <div class="numbered-item">
+          <div class="numbered-title">Da 3 a 6 mesi</div>
+          <div class="numbered-body">Chi è fermo riceve un intervento mirato.</div>
+        </div>
+        <p>Gli indicatori vengono definiti per ogni flusso sulla base del People Impact — non sono uguali per tutti.</p>
+      </div>
+      <div class="added-col col-divider">
+        <div class="added-col-title">Attività</div>
+        <ul class="bullets">
+          <li>check anonimo ogni due settimane — 2-3 domande</li>
+          <li>conversazioni dirette con persone chiave ogni settimana nei primi 30 giorni</li>
+          <li>monitoraggio uso parallelo vecchi strumenti</li>
+          <li>interventi correttivi mirati per flusso e gruppo</li>
+          <li>verifica revisione KPI dopo il go-live</li>
+        </ul>
+      </div>
+      <div class="added-col col-divider">
+        <div class="added-col-title">Realizzazione tecnica</div>
+        <div class="two-col-tech">
+          <div>
+            <div class="tech-part-label">Parte tecnica — partner</div>
+            <ul class="bullets">
+              <li>monitoraggio utilizzo strumenti</li>
+              <li>rilevazione uso parallelo strumenti vecchi</li>
+              <li>report periodico per il management</li>
+            </ul>
+          </div>
+          <div>
+            <div class="tech-part-label">Parte umana — Albina</div>
+            <ul class="bullets">
+              <li>pulse survey anonime</li>
+              <li>conversazioni dirette e interventi correttivi</li>
+              <li>definizione indicatori adoption per flusso</li>
+            </ul>
+          </div>
+        </div>
+        <div class="nota">Prodotto congiunto: parte tecnica gestita dal partner, parte umana da Albina. Si vende insieme all'implementazione, non dopo.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NUOVI PRODOTTI -->
+<div class="products-section">
+  <div class="section-label">Nuovi prodotti — sulla base dei risultati</div>
+  <div class="products-grid">
+
+    <div class="product-card">
+      <div class="product-title">Coaching</div>
+      <div class="product-when">Quando il People Impact è alto su un ruolo specifico — di solito middle manager o custode informale del processo.</div>
+      <div class="product-body">
+        <ul>
+          <li>la persona trova il suo posto nel nuovo modo di lavorare</li>
+          <li>capisce cosa porta di valore che nessun sistema può sostituire</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-title">Workshop</div>
+      <div class="product-when">Quando la readiness di un intero reparto è bassa — non una persona sola, ma una cultura di team.</div>
+      <div class="product-body">
+        <ul>
+          <li>il team lavora insieme sul cambiamento invece di subirlo</li>
+          <li>capisce cosa sta cambiando e cosa significa per il lavoro quotidiano</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-title">Sessione UX del processo</div>
+      <div class="product-when">Quando il People Impact è alto — indipendentemente dal punteggio tecnico.</div>
+      <div class="product-body">
+        <ul>
+          <li>il team disegna insieme come dovrebbe funzionare il nuovo processo</li>
+          <li>il risultato è un brief chiaro per il partner tecnico — scritto nel linguaggio di chi userà il sistema</li>
+          <li>le persone si oppongono meno perché hanno contribuito a costruirlo</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
